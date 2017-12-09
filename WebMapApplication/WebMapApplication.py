@@ -15,13 +15,17 @@ def colorProducer(elevation):
     else:
         return "red"
 
-map = folium.Map(location=[23.0225,72.5714],zoom_start=10,tiles="Mapbox Bright")
-featureGroup=folium.FeatureGroup(name="Web Map")
+map = folium.Map(location=[38.58, -99.09], zoom_start=6, tiles="Mapbox Bright")
+featureGroupVolcanoes=folium.FeatureGroup(name="Volcanoes")
 
 for lat,lon,elevation in zip(latitudeList,longitudeList,elevationList):
-    featureGroup.add_child(folium.CircleMarker(location=[lat, lon], radius = 10, popup=str(elevation)+" m",
+    featureGroupVolcanoes.add_child(folium.CircleMarker(location=[lat, lon], radius = 6, popup=str(elevation)+" m",
     fill_color=colorProducer(elevation), fill=True,  color = 'grey', fill_opacity=0.7))
 
+featureGroupPopulation=folium.FeatureGroup(name="Population")
+featureGroupPopulation.add_child(folium.GeoJson(data=(open("world.json",'r',encoding="utf-8-sig")).read(),style_function=lambda x:{'fillColor':'green' if x['properties']['POP2005'] < 1000000 else 'orange' if 1000000 <= x['properties']['POP2005'] < 2000000 else 'red'}))
 
-map.add_child(featureGroup)
+map.add_child(featureGroupVolcanoes)
+map.add_child(featureGroupPopulation)
+map.add_child(folium.LayerControl())
 map.save("WebMap.html")
